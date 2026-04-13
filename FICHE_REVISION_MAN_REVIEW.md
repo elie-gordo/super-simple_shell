@@ -1,453 +1,738 @@
-# Fiche de revision complete - decomposition code par code
+# Fiche de revision man review - decomposition complete A a Z
 
-But de cette fiche:
-- expliquer chaque fichier completement en man review
-- savoir dire pourquoi chaque bloc est ecrit a cet endroit
-- parler simplement, mais avec des mots techniques justes
+Objectif:
+- qu une personne debutante puisse ouvrir le code et tout comprendre
+- expliquer chaque element de chaque fichier
+- savoir repondre au pourquoi de chaque choix
 
----
+Comment lire cette fiche:
+- pour chaque fichier: role, lecture pas a pas, logique, erreurs possibles, phrase orale prete
 
-## 0) Methode pour presenter n importe quel fichier
-
-Quand on te montre un fichier, reponds dans cet ordre:
-1. Role du fichier (a quoi il sert)
-2. Entrees / sorties (ce qu il lit, ce qu il affiche/retourne)
-3. Structure (variables, boucle, conditions)
-4. Appels systeme / libc utilises et pourquoi
-5. Gestion des erreurs
-6. Ce qui pourrait casser si on enleve un bloc
-
----
+--------------------------------------------------
 
 ## 1) 0-getppid.c
 
-### Role
-Afficher le PPID (PID du parent).
+Role du fichier:
+- afficher le PPID (parent process id) du processus courant
 
-### Decomposition complete
-- `#include <stdio.h>`: pour `printf`.
-- `#include <sys/types.h>`: pour le type `pid_t`.
-- `#include <unistd.h>`: pour `getppid()`.
-- `int main(void)`: programme sans argument.
-- `pid_t parent_pid;`: variable typee pour stocker un identifiant de processus.
-- `parent_pid = getppid();`: recuperation du parent.
-- `printf("%u\n", (unsigned int)parent_pid);`: affichage du resultat.
-- `return (0);`: fin normale.
+Lecture pas a pas:
+1. include stdio.h
+- apporte printf pour afficher du texte
 
-### Pourquoi ce choix
-On utilise le type systeme `pid_t` car c est le format natif des PID.
+2. include sys/types.h
+- apporte le type pid_t
 
-### Ce que tu peux dire a l oral
-Ce programme sert juste a verifier qui a cree notre processus.
+3. include unistd.h
+- apporte getppid
 
----
+4. main(void)
+- programme sans arguments
+
+5. declaration pid_t parent_pid
+- reserve une variable adaptee aux id processus
+
+6. parent_pid = getppid()
+- recupere le pid du parent
+
+7. printf("%u\n", (unsigned int)parent_pid)
+- affiche le nombre
+- cast en unsigned int pour format d affichage stable
+
+8. return 0
+- fin normale
+
+Pourquoi ce code est ecrit comme ca:
+- minimal et strict pour montrer uniquement PPID
+
+Si on retire un bloc:
+- sans unistd.h -> getppid non declare
+- sans parent_pid -> pas de stockage du resultat
+
+Phrase orale prete:
+Ce fichier montre la relation parent/enfant entre processus en affichant le parent du programme lance.
+
+--------------------------------------------------
 
 ## 2) 1-pid_max.sh
 
-### Role
-Afficher la valeur maximale possible d un PID Linux.
+Role du fichier:
+- afficher la limite maximale de PID du noyau Linux
 
-### Decomposition complete
-- `#!/bin/sh`: script shell portable.
-- `cat /proc/sys/kernel/pid_max`: lit le fichier noyau expose dans `/proc`.
+Lecture pas a pas:
+1. #!/bin/sh
+- indique quel interpreteur execute le script
 
-### Pourquoi ce choix
-`/proc/sys/kernel/pid_max` est la source directe de la valeur configuree par le noyau.
+2. cat /proc/sys/kernel/pid_max
+- lit le fichier virtuel du noyau expose dans /proc
 
----
+Pourquoi ce code est ecrit comme ca:
+- c est la source systeme directe de la valeur pid_max
+
+Si on retire un bloc:
+- sans shebang le script peut ne pas etre execute correctement selon contexte
+
+Phrase orale prete:
+On lit une valeur noyau dans /proc pour connaitre la borne maximale des PID.
+
+--------------------------------------------------
 
 ## 3) 0-av.c
 
-### Role
-Afficher tous les arguments sans utiliser `ac`.
+Role du fichier:
+- afficher tous les arguments sans utiliser ac
 
-### Decomposition complete
-- `#include <stdio.h>`: `printf`.
-- `int main(int ac, char **av)`: signature classique des arguments.
-- `unsigned int i;`: index de parcours.
-- `(void)ac;`: marque `ac` comme volontairement non utilise.
-- `i = 0;`: debut du tableau.
-- `while (av[i] != NULL)`: fin detectee par sentinelle `NULL`.
-- `printf("%s\n", av[i]);`: impression de chaque element.
-- `i++;`: passe a l argument suivant.
-- `return (0);`.
+Lecture pas a pas:
+1. include stdio.h
+- printf
 
-### Pourquoi ce choix
-La consigne impose de ne pas utiliser `ac`, donc on s appuie uniquement sur `av` termine par `NULL`.
+2. main(int ac, char **av)
+- ac = nombre d arguments
+- av = tableau de chaines termine par NULL
 
----
+3. unsigned int i
+- index de parcours
+
+4. (void)ac
+- marque ac comme volontairement non utilise
+
+5. i = 0
+- debut du tableau
+
+6. while (av[i] != NULL)
+- parcourt jusqu a la sentinelle NULL
+
+7. printf("%s\n", av[i])
+- affiche argument courant
+
+8. i++
+- passe au suivant
+
+9. return 0
+- fin normale
+
+Pourquoi ce code est ecrit comme ca:
+- la consigne impose de ne pas utiliser ac
+- av suffit grace a NULL final
+
+Si on retire un bloc:
+- sans condition NULL on sort du tableau
+
+Phrase orale prete:
+J utilise la fin NULL de av pour parcourir tous les arguments sans me servir de ac.
+
+--------------------------------------------------
 
 ## 4) 1-readline.c
 
-### Role
-Afficher un prompt, lire une ligne, la reafficher, et s arreter sur EOF.
+Role du fichier:
+- boucle interactive: prompt, lecture, reaffichage
 
-### Decomposition complete
-- `_POSIX_C_SOURCE 200809L`: expose `getline` en mode POSIX.
-- includes:
-  - `stdio.h`: `printf`, `fflush`, `getline`
-  - `stdlib.h`: `free`
-  - `sys/types.h`/`unistd.h`: types POSIX
-- variables:
-  - `char *line;` buffer dynamique
-  - `size_t len;` taille du buffer
-  - `ssize_t nread;` resultat de lecture
-- initialisation:
-  - `line = NULL; len = 0;` contrat de `getline`
-- boucle infinie:
-  - `printf("$ ");` prompt
-  - `fflush(stdout);` force affichage immediat
-  - `nread = getline(&line, &len, stdin);`
-  - `if (nread == -1) break;` sortie propre (EOF)
-  - `printf("%s", line);` echo
-- `free(line);`: liberation memoire
-- `return (0);`
+Lecture pas a pas:
+1. define _POSIX_C_SOURCE 200809L
+- expose getline en environnement POSIX
 
-### Pourquoi ce choix
-`getline` est plus robuste qu un buffer fixe car la ligne peut etre longue.
+2. includes
+- stdio.h: printf, fflush, getline
+- stdlib.h: free
+- sys/types.h: ssize_t
+- unistd.h: environnement POSIX
 
----
+3. variables
+- char *line: buffer dynamique
+- size_t len: taille buffer
+- ssize_t nread: nb caracteres lus
+
+4. initialisation
+- line = NULL
+- len = 0
+- getline alloue le buffer
+
+5. while (1)
+- boucle shell-like
+
+6. printf("$ ")
+- prompt
+
+7. fflush(stdout)
+- force affichage du prompt avant saisie
+
+8. nread = getline(&line, &len, stdin)
+- lit une ligne complete
+
+9. if (nread == -1) break
+- EOF ou erreur -> sortir
+
+10. printf("%s", line)
+- reaffiche ce qui a ete lu
+
+11. free(line)
+- liberation memoire allouee par getline
+
+12. return 0
+
+Pourquoi ce code est ecrit comme ca:
+- getline est le moyen robuste demande par la consigne
+
+Si on retire un bloc:
+- sans free -> fuite memoire
+- sans fflush -> prompt peut apparaitre en retard
+
+Phrase orale prete:
+Ce fichier reproduit le cycle de base d un shell interactif en gerant proprement EOF.
+
+--------------------------------------------------
 
 ## 5) 2-commandline.c
 
-### Role
-Fournir une fonction qui split une ligne en mots (`char **`).
+Role du fichier:
+- fonction split_line qui transforme une ligne en tableau de mots
 
-### Decomposition complete
-- `_POSIX_C_SOURCE 200809L`: pour fonctions POSIX.
-- includes:
-  - `stdio.h` (pas indispensable ici, mais present)
-  - `stdlib.h`: `malloc`, `realloc`, `free`
-  - `string.h`: `strtok`
-- prototype/fonction: `char **split_line(char *line)`.
+Lecture pas a pas:
+1. define POSIX + includes
+- stdlib.h pour malloc/realloc/free
+- string.h pour strtok
 
-#### Interieur de la fonction
-- variables:
-  - `char *token;`: mot courant renvoye par `strtok`
-  - `char **words;`: tableau resultat
-  - `char **tmp;`: buffer temporaire pour `realloc` securise
-  - `size_t size = 8;`: capacite initiale
-  - `size_t i = 0;`: index ecriture
-- `words = malloc(size * sizeof(char *));`: allocation initiale
-- `token = strtok(line, " \t\n");`: premier token
-- boucle `while (token != NULL)`:
-  - `words[i] = token;`
-  - `i++`
-  - si tableau presque plein: `realloc`
-  - en cas echec `realloc`: `free(words); return NULL;`
-  - token suivant avec `strtok(NULL, ...)`
-- `words[i] = NULL;`: terminaison obligatoire
-- `return words;`
+2. signature
+- char **split_line(char *line)
+- retourne un tableau de pointeurs de mots
 
-### Pourquoi ce choix
-- `strtok` colle a la consigne.
-- tableau dynamique = pas de limite arbitraire dure.
+3. variables
+- token: mot courant
+- words: tableau final
+- tmp: tampon securise pour realloc
+- size: capacite tableau
+- i: index
 
-### Point review important
-`split_line` modifie `line` (comportement normal de `strtok`).
+4. size = 8
+- capacite initiale simple
 
----
+5. words = malloc(size * sizeof(char *))
+- reserve tableau de pointeurs
+
+6. if words == NULL return NULL
+- gestion echec allocation
+
+7. token = strtok(line, " \t\n")
+- premier mot
+
+8. while (token != NULL)
+- tant qu il y a un mot
+
+9. words[i] = token; i++
+- stocke mot
+
+10. si i + 1 >= size
+- agrandit tableau
+- size *= 2
+- tmp = realloc(...)
+- si tmp == NULL -> free(words), return NULL
+- sinon words = tmp
+
+11. token = strtok(NULL, " \t\n")
+- mot suivant
+
+12. words[i] = NULL
+- terminaison obligatoire du tableau
+
+13. return words
+
+Pourquoi ce code est ecrit comme ca:
+- respecte la consigne strtok
+- dynamique pour eviter une limite fixe fragile
+
+Attention logique:
+- strtok modifie line en remplaçant les separateurs par \0
+
+Phrase orale prete:
+Cette fonction convertit du texte brut en structure exploitable par un exec.
+
+--------------------------------------------------
 
 ## 6) 3-fork_wait_execve_5.c
 
-### Role
-Executer `ls -l /tmp` dans 5 enfants, un par un.
+Role du fichier:
+- lancer ls -l /tmp dans 5 enfants successifs
 
-### Decomposition complete
-- includes:
-  - `stdio.h`: `perror`
-  - `sys/types.h`: `pid_t`
-  - `sys/wait.h`: `wait`
-  - `unistd.h`: `fork`, `execve`
-- variables:
-  - `pid_t child_pid;`
-  - `int status;`
-  - `int i;`
-  - `char *argv[] = {"/bin/ls", "-l", "/tmp", NULL};`
-- boucle `for (i = 0; i < 5; i++)`:
-  - `child_pid = fork();`
-  - si `-1`: erreur fork
-  - si `0` (enfant): `execve(argv[0], argv, NULL)`
-    - si erreur: `perror("execve")`, return 1
-  - sinon (parent): `wait(&status)`
-    - si erreur: `perror("wait")`, return 1
-- fin `return (0)`
+Lecture pas a pas:
+1. includes process
+- sys/wait.h pour wait
+- unistd.h pour fork/execve
 
-### Pourquoi ce choix
-Le `wait` dans la boucle garantit un enchainement sequentiel: on attend chaque enfant avant de creer le suivant.
+2. variables
+- child_pid
+- status
+- i
+- argv = {"/bin/ls", "-l", "/tmp", NULL}
 
----
+3. for i=0 a 4
+- boucle 5 executions
+
+4. child_pid = fork()
+- duplique processus
+
+5. if child_pid == -1
+- echec fork -> perror + return 1
+
+6. if child_pid == 0
+- enfant
+- execve(argv[0], argv, NULL)
+- si echec execve -> perror + return 1
+
+7. else
+- parent
+- wait(&status)
+- si echec wait -> perror + return 1
+
+8. return 0
+
+Pourquoi ce code est ecrit comme ca:
+- wait dans la boucle = execution sequentielle stricte
+
+Si on retire wait:
+- les enfants partent potentiellement en parallele, non conforme demande
+
+Phrase orale prete:
+Le pere cree un enfant, l enfant se remplace par ls, le pere attend, puis recommence.
+
+--------------------------------------------------
 
 ## 7) 4-super_simple_shell.c
 
-### Role
-Mini shell: lit une commande en chemin absolu et l execute sans argument.
+Role du fichier:
+- mini shell qui execute des chemins absolus sans argument
 
-### Decomposition complete
-- define POSIX + includes standards process/IO.
-- `extern char **environ;`: pour passer l environnement a `execve`.
-- variables:
-  - `line`, `len`, `nread`: lecture utilisateur
-  - `child_pid`, `status`: gestion process
-  - `char *argv[2];`: commande + NULL
-- init: `line = NULL; len = 0;`
-- boucle shell:
-  - afficher `#cisfun$ ` + `fflush`
-  - lire avec `getline`
-  - stop sur EOF (`-1`)
-  - supprimer `\n` final
-  - ignorer ligne vide
-  - `fork`
-    - erreur: `perror`, `free(line)`, return 1
-    - enfant:
-      - `argv[0] = line; argv[1] = NULL;`
-      - `execve(argv[0], argv, environ)`
-      - en cas echec: `perror`, return 1
-    - parent:
-      - `wait(&status)`
-- sortie: `free(line); return 0;`
+Lecture pas a pas:
+1. define POSIX + includes I/O/process
 
-### Pourquoi ce choix
-- `argv[2]` suffit car pas d arguments demandes.
-- `fork + execve + wait` est le schema canonique d un shell.
+2. extern char **environ
+- pour transmettre l environnement a execve
 
-### Point oral
-Le shell parent reste vivant; seul l enfant est remplace par la commande.
+3. variables
+- line, len, nread
+- child_pid, status
+- argv[2]
 
----
+4. init line=NULL, len=0
+
+5. boucle infinie
+- affiche prompt #cisfun$
+- fflush
+- getline
+- stop si -1
+
+6. nettoyage de ligne
+- si dernier caractere est \n -> remplacer par \0
+
+7. if line vide continue
+- ignore entree vide
+
+8. fork
+- erreur -> perror, free(line), return 1
+
+9. enfant
+- argv[0] = line
+- argv[1] = NULL
+- execve(argv[0], argv, environ)
+- si echec -> perror, return 1
+
+10. parent
+- wait(&status)
+
+11. fin boucle
+- free(line)
+- return 0
+
+Pourquoi ce code est ecrit comme ca:
+- c est le squelette minimal d un shell
+- parent reste resident
+- enfant execute commande
+
+Point man review:
+- pas de parsing arguments ici, volontairement conforme consigne
+
+Phrase orale prete:
+Ce shell lit une commande, cree un enfant pour l executer, et le parent attend avant de proposer la suivante.
+
+--------------------------------------------------
 
 ## 8) 5-which_path.c
 
-### Role
-Chercher un fichier dans les repertoires de PATH.
+Role du fichier:
+- chercher un nom de fichier dans PATH
 
-### Decomposition complete
+Lecture pas a pas (fonction print_found_path):
+1. getenv("PATH")
+- recupere PATH
 
-### Fonction `print_found_path(const char *filename)`
-- lit `PATH` avec `getenv`
-- copie `PATH` avec `strdup` (car `strtok` modifie)
-- decoupe par `:`
-- pour chaque dossier:
-  - calcule taille `needed`
-  - alloue `fullpath`
-  - construit `dir/filename` avec `snprintf`
-  - teste existence via `stat`
-  - si trouve: affiche et retourne 0
-- si rien trouve: retourne 1
+2. strdup(path_env)
+- copie necessaire avant strtok
 
-### `main(int ac, char **av)`
-- verifie qu au moins un argument est fourni
-- boucle sur `av[1..]`
-- appelle `print_found_path`
-- affiche `not found` si echec
+3. dir = strtok(path_copy, ":")
+- premier dossier
 
-### Pourquoi ce choix
-`stat` est une verification simple et conforme au cours pour savoir si un chemin existe.
+4. boucle sur chaque dossier
+- calcule needed = strlen(dir)+1+strlen(filename)+1
+- malloc(needed)
+- snprintf(fullpath, needed, "%s/%s", dir, filename)
+- stat(fullpath, &st)
+- si trouve: printf(fullpath), free, return 0
+- sinon free(fullpath) et dossier suivant
 
----
+5. fin
+- free(path_copy)
+- return 1
+
+Lecture pas a pas (main):
+1. verifier ac < 2 -> afficher usage
+2. boucle sur chaque argument utilisateur
+3. appeler print_found_path
+4. si retour non zero -> not found
+
+Pourquoi ce code est ecrit comme ca:
+- separation logique: recherche dans fonction, I/O utilisateur dans main
+
+Phrase orale prete:
+Je parcours chaque dossier de PATH, je construis dir/fichier, et je teste avec stat.
+
+--------------------------------------------------
 
 ## 9) 6-printenv_environ.c
 
-### Role
-Afficher toutes les variables d environnement via `environ`.
+Role du fichier:
+- afficher toutes les variables d environnement
 
-### Decomposition complete
-- `extern char **environ;`
-- boucle indexee jusqu a `NULL`
-- affiche chaque ligne brute `NOM=VALEUR`
+Lecture pas a pas:
+1. extern char **environ
+2. i=0
+3. while environ[i] != NULL
+4. printf(environ[i])
+5. i++
+6. return 0
 
-### Pourquoi ce choix
-C est la forme la plus directe de l exercice "printenv with environ".
+Pourquoi ce code est ecrit comme ca:
+- exercice direct sur variable globale environ
 
----
+Phrase orale prete:
+J affiche chaque entree NOM=VALEUR jusqu a la sentinelle NULL.
+
+--------------------------------------------------
 
 ## 10) 7-env_vs_environ.c
 
-### Role
-Montrer l adresse de `env` (parametre main) et de `environ` (globale).
+Role du fichier:
+- comparer env (parametre main) et environ (globale)
 
-### Decomposition complete
-- `extern char **environ;`
-- signature `main(int ac, char **av, char **env)`
-- `(void)ac; (void)av;`
-- `printf` des deux pointeurs avec `%p`
+Lecture pas a pas:
+1. extern char **environ
+2. main(..., char **env)
+3. (void)ac et (void)av pour eviter warnings
+4. printf des adresses avec %p
+5. return 0
 
-### Pourquoi ce choix
-Comparer les adresses est la facon la plus claire de verifier s ils referencent la meme zone.
+Pourquoi ce code est ecrit comme ca:
+- preuve pratique de la relation env/environ
 
----
+Phrase orale prete:
+Je compare les adresses memoire pour verifier si env et environ pointent la meme zone.
+
+--------------------------------------------------
 
 ## 11) 8-getenv_custom.c
 
-### Role
-Implanter `_getenv` sans appeler `getenv`.
+Role du fichier:
+- reimplementer getenv sans utiliser getenv
 
-### Decomposition complete
-- includes: `string.h` pour `strlen`, `strncmp`
-- `extern char **environ;`
-- validation entree:
-  - `name == NULL` ou `*name == '\0'` -> `NULL`
-- `name_len = strlen(name)`
-- `env = environ`
-- boucle tant que `*env != NULL`
-  - compare prefixe avec `strncmp`
-  - verifie `=` juste apres le nom
-  - retourne pointeur sur valeur `&((*env)[name_len + 1])`
-- si non trouve: `NULL`
+Lecture pas a pas:
+1. include string.h
+- strlen et strncmp
 
-### Pourquoi ce choix
-La verif du caractere `=` evite les faux positifs de prefixe.
+2. extern char **environ
 
----
+3. signature _getenv(const char *name)
+
+4. variables
+- name_len
+- env pointeur de parcours
+
+5. validation
+- si name NULL ou vide -> NULL
+
+6. name_len = strlen(name)
+
+7. env = environ
+
+8. boucle while (*env != NULL)
+- verifier prefixe exact:
+  - strncmp(*env, name, name_len) == 0
+  - et caractere suivant == '='
+- si match retourner pointeur sur valeur:
+  - &((*env)[name_len + 1])
+- sinon env++
+
+9. return NULL si non trouve
+
+Pourquoi ce code est ecrit comme ca:
+- test du '=' evite faux match de prefixe
+
+Phrase orale prete:
+Je parcours environ et je cherche exactement NOM=, puis je retourne l adresse de la valeur.
+
+--------------------------------------------------
 
 ## 12) 9-path_print_dirs.c
 
-### Role
-Fonction `print_path_dirs` qui affiche chaque dossier de PATH.
+Role du fichier:
+- fonction qui affiche chaque dossier de PATH
 
-### Decomposition complete
-- `getenv("PATH")`
-- garde-fou si `PATH` absent
-- copie avec `strdup`
-- split avec `strtok(":")`
-- `printf` pour chaque dossier
-- `free(path_copy)`
+Lecture pas a pas:
+1. includes stdio/stdlib/string
+2. signature void print_path_dirs(void)
+3. lire PATH avec getenv
+4. si PATH absent -> return
+5. dupliquer PATH avec strdup
+6. si echec alloc -> return
+7. strtok par ':'
+8. boucle printf dossier
+9. free(path_copy)
 
-### Pourquoi ce choix
-C est la version la plus simple et lisible de l exigence "one directory per line".
+Pourquoi ce code est ecrit comme ca:
+- simple, conforme et sur (copie avant strtok)
 
----
+Phrase orale prete:
+Je lis PATH, je le decoupe par ':', et j affiche chaque dossier sur sa propre ligne.
+
+--------------------------------------------------
 
 ## 13) 10-path_linked_list.c
 
-### Role
-Construire une liste chainee de dossiers PATH.
+Role du fichier:
+- construire une liste chainee des dossiers PATH
 
-### Decomposition complete
+Lecture pas a pas:
+1. struct path_node
+- dir: chaine dossier
+- next: pointeur suivant
 
-### `struct path_node`
-- `char *dir;`
-- `struct path_node *next;`
+2. add_node_end
+- alloue new_node
+- duplique dir
+- si head NULL -> devient tete
+- sinon trouve dernier noeud et accroche
+- return 0/1
 
-### `add_node_end`
-- alloue un noeud
-- duplique `dir`
-- ajoute en tete si liste vide
-- sinon parcourt jusqu a la fin et chainage
+3. free_list
+- parcourt noeuds
+- libere dir puis noeud
 
-### `free_list`
-- parcourt la liste
-- libere `dir` puis noeud
+4. build_path_list
+- lit PATH
+- copie PATH
+- init head NULL
+- strtok(':')
+- pour chaque dir: add_node_end
+- si erreur: free(path_copy), free_list(head), return NULL
+- fin: free(path_copy), return head
 
-### `build_path_list`
-- lit et copie PATH
-- split par `:`
-- ajoute chaque dossier via `add_node_end`
-- en cas erreur: nettoyage complet
-- retourne tete de liste
+Pourquoi ce code est ecrit comme ca:
+- responsibilities separees: ajout, liberation, construction
 
-### Pourquoi ce choix
-Separation en 3 fonctions = code maintenable et gestion memoire propre.
+Phrase orale prete:
+Je transforme la chaine PATH en structure liste pour manipuler facilement les dossiers ensuite.
 
----
+--------------------------------------------------
 
 ## 14) 11-setenv_custom.c
 
-### Role
-Implanter `_setenv(name, value, overwrite)` sans `setenv`.
+Role du fichier:
+- ajouter ou modifier une variable d environnement sans setenv
 
-### Decomposition complete
-- validation:
-  - `name`/`value` non NULL
-  - `name` non vide
-  - `name` ne contient pas `=`
-- parcours `environ` pour trouver `name=`
-- si variable existe:
-  - si `overwrite == 0`, ne rien changer
-  - sinon construire nouvelle chaine `name=value` et remplacer
-- si variable absente:
-  - construire `name=value`
-  - allouer un nouveau tableau de pointeurs `environ`
-  - copier anciennes entrees
-  - ajouter nouvelle entree + `NULL`
+Lecture pas a pas:
+1. define POSIX + includes
+- stdio pour snprintf
+- stdlib pour malloc/free
+- string pour strlen/strncmp/strchr
 
-### Pourquoi ce choix
-Respect exact de la semantique `setenv`: ajouter ou remplacer selon `overwrite`.
+2. extern char **environ
 
----
+3. signature _setenv(name, value, overwrite)
+
+4. variables
+- i index parcours environ
+- name_len longueur du nom
+- entry_len longueur "name=value\0"
+- entry chaine construite
+- new_environ nouveau tableau de pointeurs
+
+5. validation entree
+- name NULL -> erreur
+- value NULL -> erreur
+- name vide -> erreur
+- name contient '=' -> erreur
+
+6. name_len = strlen(name)
+
+7. recherche d une variable existante
+- boucle for tant que environ[i] != NULL
+- test exact du nom + '='
+
+8. si variable existe
+- if !overwrite -> return 0 (ne change rien)
+- sinon:
+  - calcul entry_len
+  - malloc(entry_len)
+  - snprintf(entry, ..., "%s=%s", name, value)
+  - environ[i] = entry
+  - return 0
+
+9. si variable n existe pas
+- calcul entry_len
+- malloc(entry)
+- snprintf entry
+- malloc nouveau tableau (i+2)
+  - +1 pour nouvelle variable
+  - +1 pour NULL final
+- copie des anciens pointeurs dans new_environ
+- environ = new_environ
+- environ[i] = entry
+- environ[i+1] = NULL
+- return 0
+
+Pourquoi ce code est ecrit comme ca:
+- reproduit semantique setenv (ajouter ou remplacer selon overwrite)
+
+Attention a connaitre:
+- cette version ne libere pas explicitement ancienne chaine remplacee
+- acceptable pour exercice pedagogique, a mentionner honnetement
+
+Phrase orale prete:
+Je valide les entrees, je cherche la variable, puis soit je remplace selon overwrite, soit j agrandis l environnement pour ajouter une nouvelle entree.
+
+--------------------------------------------------
 
 ## 15) 12-unsetenv_custom.c
 
-### Role
-Implanter `_unsetenv(name)` sans `unsetenv`.
+Role du fichier:
+- supprimer une variable de l environnement sans unsetenv
 
-### Decomposition complete
-- validation de `name`
-- calcul `name_len`
-- parcours `environ`
-- si match `name=`:
-  - decalage a gauche de toutes les entrees suivantes
-  - `i--` pour recontroler la case courante apres decalage
-- retour 0
+Lecture pas a pas:
+1. define POSIX + include string
+2. extern char **environ
+3. signature _unsetenv(const char *name)
 
-### Pourquoi ce choix
-Le decalage conserve une liste continue jusqu au `NULL` final.
+4. variables
+- i index principal
+- j index decalage
+- name_len longueur du nom
 
----
+5. validation
+- name NULL -> erreur
+- name vide -> erreur
+- name contient '=' -> erreur
 
-## 16) Makefile (outil de build)
+6. name_len = strlen(name)
 
-### Role
-Compiler rapidement les programmes et verifier les fichiers fonctions.
+7. boucle principale sur environ
+- si entree correspond a name=
+  - boucle interne j pour decalage a gauche
+    - environ[j] = environ[j+1]
+  - i-- pour reexaminer position courante
 
-### Decomposition complete
-- `CC` et `CFLAGS`: compilation stricte (`-Wall -Wextra -Werror -pedantic`).
-- `PROGRAMS`: cibles executables.
-- `FUNC_OBJECTS`: cibles `.o` pour fichiers sans `main`.
-- `all`: lance `programs` et `functions`.
-- une regle par cible.
-- `clean`: supprime binaires et objets.
-- `re`: rebuild complet.
+8. return 0
 
-### Pourquoi ce choix
-Permet de verifier en une commande que tout compile, meme les fichiers fonctions.
+Pourquoi ce code est ecrit comme ca:
+- suppression dans tableau en place = decalage
 
----
+Phrase orale prete:
+Quand je trouve la variable, je ferme le trou en decalant tout le tableau d une case vers la gauche.
 
-## 17) README.md (doc d usage)
+--------------------------------------------------
 
-### Role
-Donner une vue claire du depot.
+## 16) Makefile
 
-### Decomposition complete
-- liste separee des fichiers programmes et fonctions
-- section build (`make`, `make programs`, `make functions`, `make clean`)
-- section revision qui pointe vers les fiches
+Role du fichier:
+- compiler rapidement les programmes et verifier les fichiers fonctions
 
-### Pourquoi ce choix
-Facilite la prise en main pour toi et pour le correcteur.
+Lecture pas a pas:
+1. CC et CFLAGS
+- choix du compilateur et des drapeaux stricts
 
----
+2. PROGRAMS
+- cibles qui ont un main et produisent executables
 
-## 18) Questions man review frequentes + reponses
+3. FUNC_OBJECTS
+- fichiers sans main compiles en .o
 
-Pourquoi `fork` puis `execve` ?
-- Parce que `execve` remplace le processus courant. Sans `fork`, le shell serait remplace.
+4. all: programs functions
+- cible par defaut
 
-Pourquoi `wait` ?
-- Pour synchroniser le parent et eviter des zombies.
+5. regles de chaque executable
+- exemple: ppid: 0-getppid.c
+- commande compile vers binaire
 
-Pourquoi `strdup` avant `strtok` sur PATH ?
-- Parce que `strtok` modifie la chaine.
+6. regles .o des fonctions
+- compile avec -c
 
-Pourquoi tester les retours d erreur ?
-- `fork`, `execve`, `malloc`, `wait`, `getline` peuvent echouer.
+7. clean
+- supprime binaires et objets
 
-Pourquoi `argv` se termine par `NULL` ?
-- C est le contrat C/POSIX de nombreuses API.
+8. re
+- clean puis all
 
----
+Pourquoi ce code est ecrit comme ca:
+- evite commandes manuelles longues
+- garantit compilation complete du depot
 
-## 19) Pitch final (1 minute)
+--------------------------------------------------
 
-J ai construit le shell par couches. D abord les bases de processus (PID/PPID), ensuite la lecture et le parsing de commande, puis le noyau d execution `fork + execve + wait`. Apres cela, j ai implemente la recherche dans PATH et la gestion de l environnement avec des fonctions personnalisees (`_getenv`, `_setenv`, `_unsetenv`). Chaque fichier a une responsabilite precise, avec gestion d erreurs et memoire adaptee au niveau demande par la consigne.
+## 17) README.md
+
+Role du fichier:
+- expliquer la structure du depot et les commandes de build
+
+Lecture pas a pas:
+1. titre + description du projet
+2. liste fichiers programmes
+3. liste fichiers fonctions
+4. section script
+5. section build
+6. section revision avec liens vers fiches
+
+Pourquoi ce code est ecrit comme ca:
+- onboarding rapide pour correcteur et etudiant
+
+--------------------------------------------------
+
+## 18) Comment expliquer la logique globale en 45 secondes
+
+J ai commence par comprendre les processus et les arguments, ensuite la lecture utilisateur et le parsing. Apres cela, j ai implemente le coeur d un shell avec fork, execve et wait. Puis j ai ajoute la resolution de commande dans PATH et la manipulation d environnement avec des fonctions custom. Chaque fichier isole une competence precise pour garder un code lisible, testable et conforme a la consigne.
+
+--------------------------------------------------
+
+## 19) Questions pieges frequentes et reponses courtes
+
+Pourquoi fork avant execve ?
+- Parce que execve remplace le processus courant. Sans fork, le shell disparait.
+
+Pourquoi wait ?
+- Pour synchroniser le parent et eviter des processus zombies.
+
+Pourquoi dupliquer PATH avant strtok ?
+- strtok modifie la chaine, il faut proteger la source.
+
+Pourquoi verifier '=' dans _getenv/_setenv/_unsetenv ?
+- Pour matcher exactement le nom de variable.
+
+Pourquoi tableaux termines par NULL ?
+- C est le contrat de parcours C/POSIX pour chaines de pointeurs.
+
+--------------------------------------------------
+
+## 20) Mini checklist avant review
+
+- Je peux expliquer chaque include de chaque fichier
+- Je peux expliquer chaque variable et son type
+- Je peux decrire le flux de control (boucles et conditions)
+- Je peux justifier chaque appel systeme/libc
+- Je peux dire ce qui se passe en cas d erreur
+- Je peux expliquer pourquoi le parent shell reste vivant
+- Je peux expliquer la gestion memoire utilisee
