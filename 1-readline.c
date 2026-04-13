@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 /**
- * main - prints a prompt, reads a line, and prints it
+ * main - affiche un prompt, lit une ligne, puis l'affiche
  *
- * Return: 0 on success
+ * Return: 0 en cas de succes
  */
 int main(void)
 {
@@ -15,27 +15,27 @@ int main(void)
     size_t len;
     ssize_t nread;
 
-    /* getline will allocate/resize this buffer for us. */
+    /* getline alloue/agrandit ce buffer automatiquement. */
     line = NULL;
     len = 0;
 
     while (1)
     {
-        /* Print shell-like prompt before waiting for input. */
+        /* Affiche le prompt avant d'attendre la saisie utilisateur. */
         printf("$ ");
-        /* Force prompt to appear immediately (important in interactive mode). */
+        /* Force l'affichage immediat du prompt (mode interactif). */
         fflush(stdout);
 
         nread = getline(&line, &len, stdin);
-        /* EOF (Ctrl+D) or read error: stop the loop cleanly. */
+        /* EOF (Ctrl+D) ou erreur: on sort proprement de la boucle. */
         if (nread == -1)
             break;
 
-        /* Echo back the exact command line that was entered. */
+        /* Reaffiche exactement la ligne saisie. */
         printf("%s", line);
     }
 
-    /* Release memory allocated by getline. */
+    /* Libere la memoire allouee par getline. */
     free(line);
     return (0);
 }

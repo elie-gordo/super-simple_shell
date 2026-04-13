@@ -3,29 +3,29 @@
 extern char **environ;
 
 /**
- * _getenv - gets an environment variable value
- * @name: variable name
+ * _getenv - recupere la valeur d'une variable d'environnement
+ * @name: nom de la variable
  *
- * Return: pointer to value string, or NULL if not found
+ * Return: pointeur vers la valeur, ou NULL si non trouvee
  */
 char *_getenv(const char *name)
 {
     size_t name_len;
     char **env;
 
-    /* Reject invalid input early. */
+    /* Rejette immediatement les entrees invalides. */
     if (name == NULL || *name == '\0')
         return (NULL);
 
-    /* Compute once, reuse in each comparison. */
+    /* Calcule la longueur une seule fois pour la reutiliser ensuite. */
     name_len = strlen(name);
     env = environ;
 
     while (*env != NULL)
     {
-        /* Match exact variable name followed by '=' (avoid prefix collisions). */
+        /* Match exact: NOM suivi de '=' pour eviter les collisions de prefixe. */
         if (strncmp(*env, name, name_len) == 0 && (*env)[name_len] == '=')
-            /* Return pointer right after '=' so caller gets only value. */
+            /* Retourne l'adresse juste apres '=' pour obtenir uniquement la valeur. */
             return (&((*env)[name_len + 1]));
         env++;
     }

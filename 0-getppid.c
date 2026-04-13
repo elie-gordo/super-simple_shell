@@ -3,17 +3,17 @@
 #include <unistd.h>
 
 /**
- * main - prints the parent process id (PPID)
+ * main - affiche l'identifiant du processus parent (PPID)
  *
- * Return: 0 on success
+ * Return: 0 en cas de succes
  */
 int main(void)
 {
     pid_t parent_pid;
 
-    /* Ask the kernel for the PID of the process that started this program. */
+    /* Demande au noyau le PID du processus qui a lance ce programme. */
     parent_pid = getppid();
-    /* Print it as an unsigned integer for easy reading in the terminal. */
+    /* Affiche la valeur dans un format simple a lire dans le terminal. */
     printf("%u\n", (unsigned int)parent_pid);
 
     return (0);

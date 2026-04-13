@@ -4,19 +4,19 @@
 #include <unistd.h>
 
 /**
- * main - executes "ls -l /tmp" in 5 child processes, one after another
+ * main - execute "ls -l /tmp" dans 5 processus enfants, l'un apres l'autre
  *
- * Return: 0 on success, 1 on failure
+ * Return: 0 en cas de succes, 1 en cas d'echec
  */
 int main(void)
 {
     pid_t child_pid;
     int status;
     int i;
-    /* execve needs a NULL-terminated argv array. */
+    /* execve attend un tableau argv termine par NULL. */
     char *argv[] = {"/bin/ls", "-l", "/tmp", NULL};
 
-    /* Launch the command in 5 distinct children, one after another. */
+    /* Lance la commande dans 5 enfants distincts, de facon sequentielle. */
     for (i = 0; i < 5; i++)
     {
         child_pid = fork();
@@ -28,7 +28,7 @@ int main(void)
 
         if (child_pid == 0)
         {
-            /* Child process: replace itself with /bin/ls. */
+            /* Processus enfant: remplace son code par /bin/ls. */
             if (execve(argv[0], argv, NULL) == -1)
             {
                 perror("execve");
@@ -37,7 +37,7 @@ int main(void)
         }
         else
         {
-            /* Parent process: wait before creating the next child. */
+            /* Processus parent: attend avant de creer l'enfant suivant. */
             if (wait(&status) == -1)
             {
                 perror("wait");

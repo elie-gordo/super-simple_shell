@@ -3,20 +3,20 @@
 extern char **environ;
 
 /**
- * main - prints addresses of env and environ
- * @ac: argument count (unused)
- * @av: argument vector (unused)
- * @env: environment from main parameter
+ * main - affiche les adresses de env et environ
+ * @ac: nombre d'arguments (non utilise)
+ * @av: tableau des arguments (non utilise)
+ * @env: environnement recu comme 3e parametre de main
  *
- * Return: 0 on success
+ * Return: 0 en cas de succes
  */
 int main(int ac, char **av, char **env)
 {
-    /* Keep signature explicit for demonstration purposes only. */
+    /* Signature complete gardee pour montrer explicitement le parametre env. */
     (void)ac;
     (void)av;
 
-    /* Compare addresses to see whether both pointers reference same table. */
+    /* Compare les adresses pour voir si les deux pointeurs visent la meme table. */
     printf("Address of env:     %p\n", (void *)env);
     printf("Address of environ: %p\n", (void *)environ);
 

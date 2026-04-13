@@ -4,10 +4,10 @@
 #include <string.h>
 
 /**
- * split_line - splits a string into words separated by spaces/tabs/newlines
- * @line: input string (will be modified)
+ * split_line - decoupe une chaine en mots separes par espaces/tabulations/retours ligne
+ * @line: chaine d'entree (sera modifiee)
  *
- * Return: NULL-terminated array of words, or NULL on failure
+ * Return: tableau de mots termine par NULL, ou NULL en cas d'echec
  */
 char **split_line(char *line)
 {
@@ -17,40 +17,40 @@ char **split_line(char *line)
     size_t size;
     size_t i;
 
-    /* Start with a small dynamic array and grow when needed. */
+    /* Demarre avec une petite capacite et agrandit si necessaire. */
     size = 8;
     i = 0;
     words = malloc(size * sizeof(char *));
     if (words == NULL)
         return (NULL);
 
-    /* First token using whitespace delimiters (space/tab/newline). */
+    /* Premier mot avec delimiters blancs (espace/tabulation/newline). */
     token = strtok(line, " \t\n");
     while (token != NULL)
     {
-        /* Store pointer to token inside the modified input buffer. */
+        /* Stocke le pointeur vers le mot dans le buffer d'entree modifie. */
         words[i] = token;
         i++;
 
-        /* Keep one extra slot for the final NULL terminator. */
+        /* Garde toujours une case libre pour le NULL final. */
         if (i + 1 >= size)
         {
             size *= 2;
             tmp = realloc(words, size * sizeof(char *));
             if (tmp == NULL)
             {
-                /* On realloc failure, free current array and report failure. */
+                /* Si realloc echoue, libere puis retourne l'echec. */
                 free(words);
                 return (NULL);
             }
             words = tmp;
         }
 
-        /* Continue tokenization from the previous strtok state. */
+        /* Continue la tokenisation a partir de l'etat interne de strtok. */
         token = strtok(NULL, " \t\n");
     }
 
-    /* NULL-terminate the returned argv-like array. */
+    /* Termine le tableau comme un argv: dernier element a NULL. */
     words[i] = NULL;
     return (words);
 }

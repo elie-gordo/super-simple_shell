@@ -2,9 +2,9 @@
 #include <string.h>
 
 /**
- * struct path_node - linked list node for PATH directories
- * @dir: directory string
- * @next: pointer to next node
+ * struct path_node - noeud de liste chainee pour les dossiers de PATH
+ * @dir: chaine du dossier
+ * @next: pointeur vers le noeud suivant
  */
 struct path_node
 {
@@ -13,18 +13,18 @@ struct path_node
 };
 
 /**
- * add_node_end - appends a new node at the end of the list
- * @head: list head pointer
- * @dir: directory string
+ * add_node_end - ajoute un nouveau noeud en fin de liste
+ * @head: pointeur vers la tete de liste
+ * @dir: chaine du dossier
  *
- * Return: 0 on success, 1 on failure
+ * Return: 0 en cas de succes, 1 en cas d'echec
  */
 int add_node_end(struct path_node **head, const char *dir)
 {
     struct path_node *new_node;
     struct path_node *tail;
 
-    /* Allocate and initialize a new list node. */
+    /* Alloue et initialise un nouveau noeud. */
     new_node = malloc(sizeof(struct path_node));
     if (new_node == NULL)
         return (1);
@@ -39,12 +39,12 @@ int add_node_end(struct path_node **head, const char *dir)
     new_node->next = NULL;
     if (*head == NULL)
     {
-        /* Empty list: new node becomes head. */
+        /* Liste vide: le nouveau noeud devient la tete. */
         *head = new_node;
         return (0);
     }
 
-    /* Non-empty list: walk to the end and append. */
+    /* Liste non vide: va jusqu'a la fin puis ajoute le noeud. */
     tail = *head;
     while (tail->next != NULL)
         tail = tail->next;
@@ -54,14 +54,14 @@ int add_node_end(struct path_node **head, const char *dir)
 }
 
 /**
- * free_list - frees all nodes
- * @head: list head
+ * free_list - libere tous les noeuds de la liste
+ * @head: tete de liste
  */
 void free_list(struct path_node *head)
 {
     struct path_node *tmp;
 
-    /* Free every node and its duplicated directory string. */
+    /* Libere chaque noeud ainsi que sa chaine dupliquee. */
     while (head != NULL)
     {
         tmp = head->next;
@@ -72,9 +72,9 @@ void free_list(struct path_node *head)
 }
 
 /**
- * build_path_list - builds linked list from PATH variable
+ * build_path_list - construit une liste chainee a partir de PATH
  *
- * Return: list head or NULL
+ * Return: tete de liste ou NULL
  */
 struct path_node *build_path_list(void)
 {
@@ -83,7 +83,7 @@ struct path_node *build_path_list(void)
     char *dir;
     struct path_node *head;
 
-    /* Acquire PATH and protect original value before tokenization. */
+    /* Recupere PATH et protege la valeur originale avant tokenisation. */
     path_env = getenv("PATH");
     if (path_env == NULL)
         return (NULL);
@@ -96,7 +96,7 @@ struct path_node *build_path_list(void)
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
-        /* Build list incrementally, abort cleanly on allocation failure. */
+        /* Construit la liste progressivement et nettoie en cas d'echec memoire. */
         if (add_node_end(&head, dir) != 0)
         {
             free(path_copy);

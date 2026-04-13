@@ -7,10 +7,10 @@
 #include <unistd.h>
 
 /**
- * print_found_path - prints the first matching executable in PATH for filename
- * @filename: file to look for
+ * print_found_path - affiche le premier executable correspondant dans PATH
+ * @filename: fichier a rechercher
  *
- * Return: 0 if found, 1 otherwise
+ * Return: 0 si trouve, 1 sinon
  */
 int print_found_path(const char *filename)
 {
@@ -21,12 +21,12 @@ int print_found_path(const char *filename)
     size_t needed;
     struct stat st;
 
-    /* PATH is a ':'-separated list of directories to scan. */
+    /* PATH est une liste de dossiers separes par ':'. */
     path_env = getenv("PATH");
     if (path_env == NULL)
         return (1);
 
-    /* Duplicate PATH because strtok modifies the string in place. */
+    /* Duplique PATH car strtok modifie la chaine en place. */
     path_copy = strdup(path_env);
     if (path_copy == NULL)
         return (1);
@@ -34,7 +34,7 @@ int print_found_path(const char *filename)
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
-        /* Space for "dir" + '/' + "filename" + '\0'. */
+        /* Reserve l'espace pour "dir" + '/' + "filename" + '\0'. */
         needed = strlen(dir) + 1 + strlen(filename) + 1;
         fullpath = malloc(needed);
         if (fullpath == NULL)
@@ -43,10 +43,10 @@ int print_found_path(const char *filename)
             return (1);
         }
 
-        /* Build candidate path in a bounded, safe way. */
+        /* Construit le chemin candidat de facon bornee et sure. */
         snprintf(fullpath, needed, "%s/%s", dir, filename);
 
-        /* stat == 0 means file exists at this path. */
+        /* stat == 0 signifie que le fichier existe a cet emplacement. */
         if (stat(fullpath, &st) == 0)
         {
             printf("%s\n", fullpath);
@@ -56,7 +56,7 @@ int print_found_path(const char *filename)
         }
 
         free(fullpath);
-        /* Check next directory in PATH. */
+        /* Passe au dossier suivant de PATH. */
         dir = strtok(NULL, ":");
     }
 
@@ -65,24 +65,24 @@ int print_found_path(const char *filename)
 }
 
 /**
- * main - looks for each file argument in PATH
- * @ac: argument count
- * @av: argument vector
+ * main - recherche chaque argument de fichier dans PATH
+ * @ac: nombre d'arguments
+ * @av: tableau des arguments
  *
- * Return: 0 on success
+ * Return: 0 en cas de succes
  */
 int main(int ac, char **av)
 {
     int i;
 
-    /* Need at least one filename to search. */
+    /* Il faut au moins un nom de fichier a chercher. */
     if (ac < 2)
     {
         printf("Usage: %s filename ...\n", av[0]);
         return (1);
     }
 
-    /* Process each argument independently. */
+    /* Traite chaque argument independamment. */
     for (i = 1; i < ac; i++)
     {
         if (print_found_path(av[i]) != 0)

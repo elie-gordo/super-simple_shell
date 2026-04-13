@@ -3,9 +3,9 @@
 #include <string.h>
 
 /**
- * print_path_dirs - prints each PATH directory on its own line
+ * print_path_dirs - affiche chaque dossier de PATH sur sa propre ligne
  *
- * Return: nothing
+ * Return: rien
  */
 void print_path_dirs(void)
 {
@@ -13,17 +13,17 @@ void print_path_dirs(void)
     char *path_copy;
     char *dir;
 
-    /* Read PATH from current process environment. */
+    /* Lit PATH depuis l'environnement du processus courant. */
     path_env = getenv("PATH");
     if (path_env == NULL)
         return;
 
-    /* Duplicate PATH before strtok, which edits the input string. */
+    /* Duplique PATH avant strtok, car strtok modifie la chaine. */
     path_copy = strdup(path_env);
     if (path_copy == NULL)
         return;
 
-    /* Print one directory per line as required by exercise. */
+    /* Affiche un dossier par ligne, comme demande dans l'exercice. */
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {

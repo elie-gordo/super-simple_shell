@@ -4,10 +4,10 @@
 extern char **environ;
 
 /**
- * _unsetenv - removes an environment variable from environ
- * @name: variable name
+ * _unsetenv - supprime une variable d'environnement de environ
+ * @name: nom de la variable
  *
- * Return: 0 on success, -1 on failure
+ * Return: 0 en cas de succes, -1 en cas d'echec
  */
 int _unsetenv(const char *name)
 {
@@ -15,21 +15,21 @@ int _unsetenv(const char *name)
     size_t j;
     size_t name_len;
 
-    /* Reject invalid variable names. */
+    /* Rejette les noms de variable invalides. */
     if (name == NULL || *name == '\0' || strchr(name, '=') != NULL)
         return (-1);
 
     name_len = strlen(name);
 
-    /* Scan environ and remove every matching NAME=... occurrence. */
+    /* Parcourt environ et supprime chaque occurrence correspondant a NAME=... */
     for (i = 0; environ[i] != NULL; i++)
     {
         if (strncmp(environ[i], name, name_len) == 0 && environ[i][name_len] == '=')
         {
-            /* Shift left to overwrite removed entry and keep array contiguous. */
+            /* Decale vers la gauche pour combler le trou et garder un tableau continu. */
             for (j = i; environ[j] != NULL; j++)
                 environ[j] = environ[j + 1];
-            /* Re-check same index because a new entry moved into position i. */
+            /* Recontrole le meme index car une nouvelle entree y a ete deplacee. */
             i--;
         }
     }

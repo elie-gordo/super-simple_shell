@@ -1,3 +1,3 @@
 #!/bin/sh
-# Read kernel setting that defines the maximum possible process ID on Linux.
+# Lit le parametre noyau qui definit la valeur maximale possible d'un PID Linux.
 cat /proc/sys/kernel/pid_max

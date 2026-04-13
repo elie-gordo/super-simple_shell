@@ -6,12 +6,12 @@
 extern char **environ;
 
 /**
- * _setenv - adds or changes an environment variable
- * @name: variable name
- * @value: variable value
- * @overwrite: overwrite existing value if non-zero
+ * _setenv - ajoute ou modifie une variable d'environnement
+ * @name: nom de la variable
+ * @value: valeur de la variable
+ * @overwrite: ecrase la valeur existante si non nul
  *
- * Return: 0 on success, -1 on failure
+ * Return: 0 en cas de succes, -1 en cas d'echec
  */
 int _setenv(const char *name, const char *value, int overwrite)
 {
@@ -21,21 +21,21 @@ int _setenv(const char *name, const char *value, int overwrite)
     char *entry;
     char **new_environ;
 
-    /* Validate input name/value according to environment variable rules. */
+    /* Valide les entrees selon les regles des variables d'environnement. */
     if (name == NULL || value == NULL || *name == '\0' || strchr(name, '=') != NULL)
         return (-1);
 
-    /* Search for existing variable named "name". */
+    /* Recherche d'abord si la variable "name" existe deja. */
     name_len = strlen(name);
     for (i = 0; environ[i] != NULL; i++)
     {
         if (strncmp(environ[i], name, name_len) == 0 && environ[i][name_len] == '=')
         {
-            /* Keep current value if overwrite is disabled. */
+            /* Conserve la valeur actuelle si overwrite est desactive. */
             if (!overwrite)
                 return (0);
 
-            /* Replace existing NAME=value entry with a freshly built one. */
+            /* Remplace l'entree existante NAME=value par une nouvelle chaine. */
             entry_len = name_len + 1 + strlen(value) + 1;
             entry = malloc(entry_len);
             if (entry == NULL)
@@ -46,14 +46,14 @@ int _setenv(const char *name, const char *value, int overwrite)
         }
     }
 
-    /* Variable does not exist: build a new NAME=value string. */
+    /* Variable absente: construit une nouvelle chaine NAME=value. */
     entry_len = name_len + 1 + strlen(value) + 1;
     entry = malloc(entry_len);
     if (entry == NULL)
         return (-1);
     snprintf(entry, entry_len, "%s=%s", name, value);
 
-    /* Grow environ pointer table by one entry + trailing NULL sentinel. */
+    /* Agrandit la table de pointeurs environ (+1 entree + NULL final). */
     new_environ = malloc((i + 2) * sizeof(char *));
     if (new_environ == NULL)
     {
@@ -61,7 +61,7 @@ int _setenv(const char *name, const char *value, int overwrite)
         return (-1);
     }
 
-    /* Copy previous entries, then append the new one. */
+    /* Copie les anciennes entrees, puis ajoute la nouvelle. */
     for (name_len = 0; name_len < i; name_len++)
         new_environ[name_len] = environ[name_len];
 

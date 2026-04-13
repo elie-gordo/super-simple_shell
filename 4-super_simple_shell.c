@@ -9,9 +9,9 @@
 extern char **environ;
 
 /**
- * main - super simple shell: executes full-path commands without arguments
+ * main - shell tres simple: execute des commandes en chemin complet sans arguments
  *
- * Return: 0 on success
+ * Return: 0 en cas de succes
  */
 int main(void)
 {
@@ -22,26 +22,26 @@ int main(void)
     int status;
     char *argv[2];
 
-    /* getline manages allocation/reallocation of this buffer. */
+    /* getline gere l'allocation/reallocation de ce buffer. */
     line = NULL;
     len = 0;
 
-    /* Infinite REPL loop: prompt -> read -> execute -> wait. */
+    /* Boucle REPL infinie: prompt -> lecture -> execution -> attente. */
     while (1)
     {
         printf("#cisfun$ ");
         fflush(stdout);
 
         nread = getline(&line, &len, stdin);
-        /* EOF (Ctrl+D) or read error: exit shell loop. */
+        /* EOF (Ctrl+D) ou erreur de lecture: on sort du shell. */
         if (nread == -1)
             break;
 
-        /* Drop trailing newline so execve receives a clean path string. */
+        /* Supprime le '\n' final pour donner a execve un chemin propre. */
         if (nread > 0 && line[nread - 1] == '\n')
             line[nread - 1] = '\0';
 
-        /* Ignore empty commands and show prompt again. */
+        /* Ignore les lignes vides et reaffiche le prompt. */
         if (line[0] == '\0')
             continue;
 
@@ -55,10 +55,10 @@ int main(void)
 
         if (child_pid == 0)
         {
-            /* This first shell version accepts only full path, no arguments. */
+            /* Cette premiere version accepte uniquement un chemin complet, sans argument. */
             argv[0] = line;
             argv[1] = NULL;
-            /* Keep current environment so executed program sees PATH/HOME/etc. */
+            /* Conserve l'environnement courant (PATH/HOME/etc.) pour le programme lance. */
             if (execve(argv[0], argv, environ) == -1)
             {
                 perror("execve");
@@ -67,12 +67,12 @@ int main(void)
         }
         else
         {
-            /* Parent blocks until child terminates (simple, deterministic flow). */
+            /* Le parent attend la fin de l'enfant (flux simple et deterministe). */
             wait(&status);
         }
     }
 
-    /* Release getline buffer before exiting program. */
+    /* Libere le buffer getline avant de quitter le programme. */
     free(line);
     return (0);
 }
