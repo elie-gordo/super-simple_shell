@@ -11,31 +11,28 @@
  */
 int main(void)
 {
-    char *line;
-    size_t len;
-    ssize_t nread;
+	char *line;
+	size_t len;
+	ssize_t nread;
 
-    /* getline alloue/agrandit ce buffer automatiquement. */
-    line = NULL;
-    len = 0;
-
-    while (1)
-    {
-        /* Affiche le prompt avant d'attendre la saisie utilisateur. */
-        printf("$ ");
-        /* Force l'affichage immediat du prompt (mode interactif). */
-        fflush(stdout);
-
-        nread = getline(&line, &len, stdin);
-        /* EOF (Ctrl+D) ou erreur: on sort proprement de la boucle. */
-        if (nread == -1)
-            break;
-
-        /* Reaffiche exactement la ligne saisie. */
-        printf("%s", line);
-    }
-
-    /* Libere la memoire allouee par getline. */
-    free(line);
-    return (0);
+	/* Let getline allocate and grow this buffer as needed. */
+	line = NULL;
+	len = 0;
+	while (1)
+	{
+		/* Prompt before reading user input. */
+		printf("$ ");
+		/* Force prompt display in interactive mode. */
+		fflush(stdout);
+		/* Read one full line, including spaces, until newline or EOF. */
+		nread = getline(&line, &len, stdin);
+		/* Stop on EOF (Ctrl+D) or read error. */
+		if (nread == -1)
+			break;
+		/* Echo the exact line that was typed. */
+		printf("%s", line);
+	}
+	/* Release memory allocated by getline before exit. */
+	free(line);
+	return (0);
 }

@@ -9,27 +9,25 @@
  */
 void print_path_dirs(void)
 {
-    char *path_env;
-    char *path_copy;
-    char *dir;
+	char *path_env;
+	char *path_copy;
+	char *dir;
 
-    /* Lit PATH depuis l'environnement du processus courant. */
-    path_env = getenv("PATH");
-    if (path_env == NULL)
-        return;
-
-    /* Duplique PATH avant strtok, car strtok modifie la chaine. */
-    path_copy = strdup(path_env);
-    if (path_copy == NULL)
-        return;
-
-    /* Affiche un dossier par ligne, comme demande dans l'exercice. */
-    dir = strtok(path_copy, ":");
-    while (dir != NULL)
-    {
-        printf("%s\n", dir);
-        dir = strtok(NULL, ":");
-    }
-
-    free(path_copy);
+	/* Read PATH from process environment. */
+	path_env = getenv("PATH");
+	if (path_env == NULL)
+		return;
+	/* Duplicate before strtok because it mutates the string. */
+	path_copy = strdup(path_env);
+	if (path_copy == NULL)
+		return;
+	/* Print each PATH directory on its own line. */
+	dir = strtok(path_copy, ":");
+	while (dir != NULL)
+	{
+		printf("%s\n", dir);
+		dir = strtok(NULL, ":");
+	}
+	/* Release duplicated PATH buffer. */
+	free(path_copy);
 }

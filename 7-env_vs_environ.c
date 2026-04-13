@@ -1,6 +1,5 @@
 #include <stdio.h>
-
-extern char **environ;
+#include "environ_custom.h"
 
 /**
  * main - affiche les adresses de env et environ
@@ -12,13 +11,11 @@ extern char **environ;
  */
 int main(int ac, char **av, char **env)
 {
-    /* Signature complete gardee pour montrer explicitement le parametre env. */
-    (void)ac;
-    (void)av;
-
-    /* Compare les adresses pour voir si les deux pointeurs visent la meme table. */
-    printf("Address of env:     %p\n", (void *)env);
-    printf("Address of environ: %p\n", (void *)environ);
-
-    return (0);
+	/* Keep full signature for demonstration, ignore unused args. */
+	(void)ac;
+	(void)av;
+	/* Show both pointers to compare address identity in practice. */
+	printf("Address of env: %p\n", (void *)env);
+	printf("Address of environ: %p\n", (void *)environ);
+	return (0);
 }

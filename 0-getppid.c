@@ -9,12 +9,12 @@
  */
 int main(void)
 {
-    pid_t parent_pid;
+	pid_t parent_pid;
 
-    /* Demande au noyau le PID du processus qui a lance ce programme. */
-    parent_pid = getppid();
-    /* Affiche la valeur dans un format simple a lire dans le terminal. */
-    printf("%u\n", (unsigned int)parent_pid);
+	/* Ask the kernel for the parent process identifier. */
+	parent_pid = getppid();
+	/* Print it once, one value per line for easy testing. */
+	printf("%u\n", (unsigned int)parent_pid);
 
-    return (0);
+	return (0);
 }

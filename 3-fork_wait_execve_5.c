@@ -10,41 +10,39 @@
  */
 int main(void)
 {
-    pid_t child_pid;
-    int status;
-    int i;
-    /* execve attend un tableau argv termine par NULL. */
-    char *argv[] = {"/bin/ls", "-l", "/tmp", NULL};
+	pid_t child_pid;
+	int status;
+	int i;
+	/* argv for execve: command, arg1, arg2, NULL sentinel. */
+	char *argv[] = {"/bin/ls", "-l", "/tmp", NULL};
 
-    /* Lance la commande dans 5 enfants distincts, de facon sequentielle. */
-    for (i = 0; i < 5; i++)
-    {
-        child_pid = fork();
-        if (child_pid == -1)
-        {
-            perror("fork");
-            return (1);
-        }
-
-        if (child_pid == 0)
-        {
-            /* Processus enfant: remplace son code par /bin/ls. */
-            if (execve(argv[0], argv, NULL) == -1)
-            {
-                perror("execve");
-                return (1);
-            }
-        }
-        else
-        {
-            /* Processus parent: attend avant de creer l'enfant suivant. */
-            if (wait(&status) == -1)
-            {
-                perror("wait");
-                return (1);
-            }
-        }
-    }
-
-    return (0);
+	/* Create 5 children sequentially, one command execution per child. */
+	for (i = 0; i < 5; i++)
+	{
+		child_pid = fork();
+		if (child_pid == -1)
+		{
+			perror("fork");
+			return (1);
+		}
+		if (child_pid == 0)
+		{
+			/* Child replaces itself with /bin/ls. */
+			if (execve(argv[0], argv, NULL) == -1)
+			{
+				perror("execve");
+				return (1);
+			}
+		}
+		else
+		{
+			/* Parent waits before starting the next iteration. */
+			if (wait(&status) == -1)
+			{
+				perror("wait");
+				return (1);
+			}
+		}
+	}
+	return (0);
 }

@@ -1,6 +1,5 @@
 #include <stdio.h>
-
-extern char **environ;
+#include "environ_custom.h"
 
 /**
  * main - affiche l'environnement via la variable globale environ
@@ -9,16 +8,15 @@ extern char **environ;
  */
 int main(void)
 {
-    unsigned int i;
+	unsigned int i;
 
-    /* environ est termine par NULL: on parcourt jusqu'a ce marqueur. */
-    i = 0;
-    while (environ[i] != NULL)
-    {
-        /* Chaque entree respecte le format NOM=valeur. */
-        printf("%s\n", environ[i]);
-        i++;
-    }
-
-    return (0);
+	/* environ is NULL-terminated: iterate until sentinel. */
+	i = 0;
+	while (environ[i] != NULL)
+	{
+		/* Each entry has NAME=value format. */
+		printf("%s\n", environ[i]);
+		i++;
+	}
+	return (0);
 }

@@ -2,72 +2,103 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-extern char **environ;
+#include "environ_custom.h"
 
 /**
- * _setenv - ajoute ou modifie une variable d'environnement
- * @name: nom de la variable
- * @value: valeur de la variable
- * @overwrite: ecrase la valeur existante si non nul
+ * make_entry - build NAME=value string
+ * @name: variable name
+ * @value: variable value
  *
- * Return: 0 en cas de succes, -1 en cas d'echec
+ * Return: allocated string or NULL
+ */
+static char *make_entry(const char *name, const char *value)
+{
+	size_t len;
+	char *entry;
+
+	/* NAME + '=' + VALUE + '\0'. */
+	len = strlen(name) + strlen(value) + 2;
+	entry = malloc(len);
+	if (entry == NULL)
+		return (NULL);
+	/* Build canonical environment entry representation. */
+	snprintf(entry, len, "%s=%s", name, value);
+	return (entry);
+}
+
+/**
+ * append_entry - append new entry to environ
+ * @entry: allocated NAME=value string
+ *
+ * Return: 0 on success, -1 on failure
+ */
+static int append_entry(char *entry)
+{
+	size_t i;
+	char **new_env;
+
+	/* Count existing entries. */
+	for (i = 0; environ[i] != NULL; i++)
+		;
+	/* Allocate new pointer table: old entries + new one + NULL. */
+	new_env = malloc((i + 2) * sizeof(char *));
+	if (new_env == NULL)
+		return (-1);
+	/* Copy pointers and append new entry at the end. */
+	for (i = 0; environ[i] != NULL; i++)
+		new_env[i] = environ[i];
+	new_env[i] = entry;
+	new_env[i + 1] = NULL;
+	environ = new_env;
+	return (0);
+}
+
+/**
+ * _setenv - add or change an environment variable
+ * @name: variable name
+ * @value: variable value
+ * @overwrite: replace existing value when non-zero
+ *
+ * Return: 0 on success, -1 on failure
  */
 int _setenv(const char *name, const char *value, int overwrite)
 {
-    size_t i;
-    size_t name_len;
-    size_t entry_len;
-    char *entry;
-    char **new_environ;
+	size_t i;
+	size_t name_len;
+	char *entry;
 
-    /* Valide les entrees selon les regles des variables d'environnement. */
-    if (name == NULL || value == NULL || *name == '\0' || strchr(name, '=') != NULL)
-        return (-1);
-
-    /* Recherche d'abord si la variable "name" existe deja. */
-    name_len = strlen(name);
-    for (i = 0; environ[i] != NULL; i++)
-    {
-        if (strncmp(environ[i], name, name_len) == 0 && environ[i][name_len] == '=')
-        {
-            /* Conserve la valeur actuelle si overwrite est desactive. */
-            if (!overwrite)
-                return (0);
-
-            /* Remplace l'entree existante NAME=value par une nouvelle chaine. */
-            entry_len = name_len + 1 + strlen(value) + 1;
-            entry = malloc(entry_len);
-            if (entry == NULL)
-                return (-1);
-            snprintf(entry, entry_len, "%s=%s", name, value);
-            environ[i] = entry;
-            return (0);
-        }
-    }
-
-    /* Variable absente: construit une nouvelle chaine NAME=value. */
-    entry_len = name_len + 1 + strlen(value) + 1;
-    entry = malloc(entry_len);
-    if (entry == NULL)
-        return (-1);
-    snprintf(entry, entry_len, "%s=%s", name, value);
-
-    /* Agrandit la table de pointeurs environ (+1 entree + NULL final). */
-    new_environ = malloc((i + 2) * sizeof(char *));
-    if (new_environ == NULL)
-    {
-        free(entry);
-        return (-1);
-    }
-
-    /* Copie les anciennes entrees, puis ajoute la nouvelle. */
-    for (name_len = 0; name_len < i; name_len++)
-        new_environ[name_len] = environ[name_len];
-
-    environ = new_environ;
-    environ[i] = entry;
-    environ[i + 1] = NULL;
-
-    return (0);
+	/* Reject invalid input according to setenv rules. */
+	if (name == NULL || value == NULL)
+		return (-1);
+	if (*name == '\0' || strchr(name, '=') != NULL)
+		return (-1);
+	name_len = strlen(name);
+	for (i = 0; environ[i] != NULL; i++)
+	{
+		/* Compare variable name before '='. */
+		if (strncmp(environ[i], name, name_len) == 0)
+		{
+			if (environ[i][name_len] != '=')
+				continue;
+			/* Keep current value if overwrite is disabled. */
+			if (!overwrite)
+				return (0);
+			/* Replace existing entry with freshly built NAME=value. */
+			entry = make_entry(name, value);
+			if (entry == NULL)
+				return (-1);
+			environ[i] = entry;
+			return (0);
+		}
+	}
+	entry = make_entry(name, value);
+	if (entry == NULL)
+		return (-1);
+	/* Variable not found: append as new environment entry. */
+	if (append_entry(entry) == -1)
+	{
+		free(entry);
+		return (-1);
+	}
+	return (0);
 }
