@@ -13,8 +13,10 @@ int main(void)
     pid_t child_pid;
     int status;
     int i;
+    /* execve needs a NULL-terminated argv array. */
     char *argv[] = {"/bin/ls", "-l", "/tmp", NULL};
 
+    /* Launch the command in 5 distinct children, one after another. */
     for (i = 0; i < 5; i++)
     {
         child_pid = fork();
@@ -26,6 +28,7 @@ int main(void)
 
         if (child_pid == 0)
         {
+            /* Child process: replace itself with /bin/ls. */
             if (execve(argv[0], argv, NULL) == -1)
             {
                 perror("execve");
@@ -34,6 +37,7 @@ int main(void)
         }
         else
         {
+            /* Parent process: wait before creating the next child. */
             if (wait(&status) == -1)
             {
                 perror("wait");

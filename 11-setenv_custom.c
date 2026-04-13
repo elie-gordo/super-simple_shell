@@ -21,17 +21,21 @@ int _setenv(const char *name, const char *value, int overwrite)
     char *entry;
     char **new_environ;
 
+    /* Validate input name/value according to environment variable rules. */
     if (name == NULL || value == NULL || *name == '\0' || strchr(name, '=') != NULL)
         return (-1);
 
+    /* Search for existing variable named "name". */
     name_len = strlen(name);
     for (i = 0; environ[i] != NULL; i++)
     {
         if (strncmp(environ[i], name, name_len) == 0 && environ[i][name_len] == '=')
         {
+            /* Keep current value if overwrite is disabled. */
             if (!overwrite)
                 return (0);
 
+            /* Replace existing NAME=value entry with a freshly built one. */
             entry_len = name_len + 1 + strlen(value) + 1;
             entry = malloc(entry_len);
             if (entry == NULL)
@@ -42,12 +46,14 @@ int _setenv(const char *name, const char *value, int overwrite)
         }
     }
 
+    /* Variable does not exist: build a new NAME=value string. */
     entry_len = name_len + 1 + strlen(value) + 1;
     entry = malloc(entry_len);
     if (entry == NULL)
         return (-1);
     snprintf(entry, entry_len, "%s=%s", name, value);
 
+    /* Grow environ pointer table by one entry + trailing NULL sentinel. */
     new_environ = malloc((i + 2) * sizeof(char *));
     if (new_environ == NULL)
     {
@@ -55,6 +61,7 @@ int _setenv(const char *name, const char *value, int overwrite)
         return (-1);
     }
 
+    /* Copy previous entries, then append the new one. */
     for (name_len = 0; name_len < i; name_len++)
         new_environ[name_len] = environ[name_len];
 

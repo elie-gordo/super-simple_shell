@@ -24,6 +24,7 @@ int add_node_end(struct path_node **head, const char *dir)
     struct path_node *new_node;
     struct path_node *tail;
 
+    /* Allocate and initialize a new list node. */
     new_node = malloc(sizeof(struct path_node));
     if (new_node == NULL)
         return (1);
@@ -38,10 +39,12 @@ int add_node_end(struct path_node **head, const char *dir)
     new_node->next = NULL;
     if (*head == NULL)
     {
+        /* Empty list: new node becomes head. */
         *head = new_node;
         return (0);
     }
 
+    /* Non-empty list: walk to the end and append. */
     tail = *head;
     while (tail->next != NULL)
         tail = tail->next;
@@ -58,6 +61,7 @@ void free_list(struct path_node *head)
 {
     struct path_node *tmp;
 
+    /* Free every node and its duplicated directory string. */
     while (head != NULL)
     {
         tmp = head->next;
@@ -79,6 +83,7 @@ struct path_node *build_path_list(void)
     char *dir;
     struct path_node *head;
 
+    /* Acquire PATH and protect original value before tokenization. */
     path_env = getenv("PATH");
     if (path_env == NULL)
         return (NULL);
@@ -91,6 +96,7 @@ struct path_node *build_path_list(void)
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
+        /* Build list incrementally, abort cleanly on allocation failure. */
         if (add_node_end(&head, dir) != 0)
         {
             free(path_copy);

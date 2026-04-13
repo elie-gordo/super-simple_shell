@@ -11,9 +11,11 @@ int main(void)
 {
     unsigned int i;
 
+    /* environ is NULL-terminated: iterate until sentinel. */
     i = 0;
     while (environ[i] != NULL)
     {
+        /* Each entry format is NAME=value. */
         printf("%s\n", environ[i]);
         i++;
     }

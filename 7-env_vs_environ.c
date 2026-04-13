@@ -12,9 +12,11 @@ extern char **environ;
  */
 int main(int ac, char **av, char **env)
 {
+    /* Keep signature explicit for demonstration purposes only. */
     (void)ac;
     (void)av;
 
+    /* Compare addresses to see whether both pointers reference same table. */
     printf("Address of env:     %p\n", (void *)env);
     printf("Address of environ: %p\n", (void *)environ);
 

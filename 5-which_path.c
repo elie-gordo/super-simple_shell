@@ -21,10 +21,12 @@ int print_found_path(const char *filename)
     size_t needed;
     struct stat st;
 
+    /* PATH is a ':'-separated list of directories to scan. */
     path_env = getenv("PATH");
     if (path_env == NULL)
         return (1);
 
+    /* Duplicate PATH because strtok modifies the string in place. */
     path_copy = strdup(path_env);
     if (path_copy == NULL)
         return (1);
@@ -32,6 +34,7 @@ int print_found_path(const char *filename)
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
+        /* Space for "dir" + '/' + "filename" + '\0'. */
         needed = strlen(dir) + 1 + strlen(filename) + 1;
         fullpath = malloc(needed);
         if (fullpath == NULL)
@@ -40,8 +43,10 @@ int print_found_path(const char *filename)
             return (1);
         }
 
+        /* Build candidate path in a bounded, safe way. */
         snprintf(fullpath, needed, "%s/%s", dir, filename);
 
+        /* stat == 0 means file exists at this path. */
         if (stat(fullpath, &st) == 0)
         {
             printf("%s\n", fullpath);
@@ -51,6 +56,7 @@ int print_found_path(const char *filename)
         }
 
         free(fullpath);
+        /* Check next directory in PATH. */
         dir = strtok(NULL, ":");
     }
 
@@ -69,12 +75,14 @@ int main(int ac, char **av)
 {
     int i;
 
+    /* Need at least one filename to search. */
     if (ac < 2)
     {
         printf("Usage: %s filename ...\n", av[0]);
         return (1);
     }
 
+    /* Process each argument independently. */
     for (i = 1; i < ac; i++)
     {
         if (print_found_path(av[i]) != 0)
