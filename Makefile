@@ -5,46 +5,46 @@ TARGETS=ppid av prompt split run5 shell _which printenv_env env_addr my_getenv p
 
 all: $(TARGETS)
 
-ppid: pid_ppid_getppid.c
+ppid: 0-getppid.c
 	$(CC) $(CFLAGS) $< -o $@
 
-av: args_av.c
+av: 0-av.c
 	$(CC) $(CFLAGS) $< -o $@
 
-prompt: read_line.c
+prompt: 1-readline.c
 	$(CC) $(CFLAGS) $< -o $@
 
-split: split_line.c
+split: 2-commandline.c
 	$(CC) $(CFLAGS) $< -o $@
 
-run5: fork_wait_execve_5.c
+run5: 3-fork_wait_execve_5.c
 	$(CC) $(CFLAGS) $< -o $@
 
-shell: super_simple_shell.c
+shell: 4-super_simple_shell.c
 	$(CC) $(CFLAGS) $< -o $@
 
-_which: which_path.c
+_which: 5-which_path.c
 	$(CC) $(CFLAGS) $< -o $@
 
-printenv_env: printenv_environ.c
+printenv_env: 6-printenv_environ.c
 	$(CC) $(CFLAGS) $< -o $@
 
-env_addr: env_vs_environ.c
+env_addr: 7-env_vs_environ.c
 	$(CC) $(CFLAGS) $< -o $@
 
-my_getenv: getenv_custom.c
+my_getenv: 8-getenv_custom.c
 	$(CC) $(CFLAGS) $< -o $@
 
-path_dirs: path_print_dirs.c
+path_dirs: 9-path_print_dirs.c
 	$(CC) $(CFLAGS) $< -o $@
 
-path_list: path_linked_list.c
+path_list: 10-path_linked_list.c
 	$(CC) $(CFLAGS) $< -o $@
 
-my_setenv: setenv_custom.c
+my_setenv: 11-setenv_custom.c
 	$(CC) $(CFLAGS) $< -o $@
 
-my_unsetenv: unsetenv_custom.c
+my_unsetenv: 12-unsetenv_custom.c
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
