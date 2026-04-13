@@ -56,3 +56,4 @@ make clean
 
 La fiche complete pour preparer la man review est ici:
 - FICHE_REVISION_MAN_REVIEW.md
+- DOC_MAN_REVIEW_CODE_WALKTHROUGH.md
