@@ -12,6 +12,13 @@ Un shell, c est un programme qui:
 - lance la commande dans cet enfant
 - attend la fin de la commande
 
+## 1.bis Mode full strict (important pour la review)
+
+Cette version est volontairement stricte par rapport a la consigne:
+- aucun fichier utilitaire non demande (pas de Makefile, pas de README de projet)
+- les exercices "Write a function" contiennent uniquement la fonction (pas de main de demo)
+- la fiche de revision est conservee pour l oral
+
 ## 2. Pourquoi on a fait ces exercices
 
 On a suivi un ordre pedagogique volontaire:
@@ -198,23 +205,23 @@ Pourquoi important:
 - Message oral: en pratique, ce sont la meme base de donnees.
 
 ### 8-getenv_custom.c
-- Recode _getenv sans getenv.
+- Recode la fonction _getenv sans utiliser getenv.
 - Message oral: on parcourt environ et on match NOM=.
 
 ### 9-path_print_dirs.c
-- Affiche chaque dossier de PATH, un par ligne.
+- Contient la fonction print_path_dirs qui affiche chaque dossier de PATH, un par ligne.
 - Message oral: PATH est une liste de repertoires.
 
 ### 10-path_linked_list.c
-- Construit une liste chainee de PATH.
+- Construit une liste chainee de PATH via build_path_list.
 - Message oral: exercice de structure de donnees applique a un cas reel.
 
 ### 11-setenv_custom.c
-- Recode _setenv sans setenv.
+- Recode la fonction _setenv sans setenv.
 - Message oral: ajouter/remplacer NOM=VALEUR avec gestion overwrite.
 
 ### 12-unsetenv_custom.c
-- Recode _unsetenv sans unsetenv.
+- Recode la fonction _unsetenv sans unsetenv.
 - Message oral: supprimer toutes les entrees d un nom donne.
 
 ## 7. Flux d execution d un shell (a reciter)

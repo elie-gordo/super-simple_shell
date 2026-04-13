@@ -47,29 +47,3 @@ char **split_line(char *line)
     words[i] = NULL;
     return (words);
 }
-
-/**
- * main - demo for split_line
- *
- * Return: 0 on success
- */
-int main(void)
-{
-    char line[] = "ls   -l   /tmp";
-    char **words;
-    size_t i;
-
-    words = split_line(line);
-    if (words == NULL)
-        return (1);
-
-    i = 0;
-    while (words[i] != NULL)
-    {
-        printf("word[%lu] = %s\n", (unsigned long)i, words[i]);
-        i++;
-    }
-
-    free(words);
-    return (0);
-}

@@ -3,11 +3,11 @@
 #include <string.h>
 
 /**
- * main - prints each PATH directory on its own line
+ * print_path_dirs - prints each PATH directory on its own line
  *
- * Return: 0 on success
+ * Return: nothing
  */
-int main(void)
+void print_path_dirs(void)
 {
     char *path_env;
     char *path_copy;
@@ -15,11 +15,11 @@ int main(void)
 
     path_env = getenv("PATH");
     if (path_env == NULL)
-        return (1);
+        return;
 
     path_copy = strdup(path_env);
     if (path_copy == NULL)
-        return (1);
+        return;
 
     dir = strtok(path_copy, ":");
     while (dir != NULL)
@@ -29,5 +29,4 @@ int main(void)
     }
 
     free(path_copy);
-    return (0);
 }

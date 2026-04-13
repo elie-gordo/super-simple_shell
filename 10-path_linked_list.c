@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,29 +102,4 @@ struct path_node *build_path_list(void)
 
     free(path_copy);
     return (head);
-}
-
-/**
- * main - demo for PATH linked list
- *
- * Return: 0 on success
- */
-int main(void)
-{
-    struct path_node *head;
-    struct path_node *cur;
-
-    head = build_path_list();
-    if (head == NULL)
-        return (1);
-
-    cur = head;
-    while (cur != NULL)
-    {
-        printf("%s\n", cur->dir);
-        cur = cur->next;
-    }
-
-    free_list(head);
-    return (0);
 }

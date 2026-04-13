@@ -64,20 +64,3 @@ int _setenv(const char *name, const char *value, int overwrite)
 
     return (0);
 }
-
-/**
- * main - demo for _setenv
- *
- * Return: 0 on success
- */
-int main(void)
-{
-    if (_setenv("MY_VAR", "hello", 1) == -1)
-    {
-        perror("_setenv");
-        return (1);
-    }
-
-    printf("MY_VAR=%s\n", getenv("MY_VAR"));
-    return (0);
-}

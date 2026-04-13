@@ -1,6 +1,4 @@
 #define _POSIX_C_SOURCE 200809L
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern char **environ;
@@ -31,35 +29,6 @@ int _unsetenv(const char *name)
             i--;
         }
     }
-
-    return (0);
-}
-
-/**
- * main - demo for _unsetenv
- * @ac: argument count
- * @av: argument vector
- *
- * Return: 0 on success
- */
-int main(int ac, char **av)
-{
-    if (ac != 2)
-    {
-        printf("Usage: %s VARIABLE_NAME\n", av[0]);
-        return (1);
-    }
-
-    if (_unsetenv(av[1]) == -1)
-    {
-        perror("_unsetenv");
-        return (1);
-    }
-
-    if (getenv(av[1]) == NULL)
-        printf("%s removed\n", av[1]);
-    else
-        printf("%s still present\n", av[1]);
 
     return (0);
 }
