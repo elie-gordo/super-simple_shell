@@ -15,9 +15,13 @@ Un shell, c est un programme qui:
 ## 1.bis Mode full strict (important pour la review)
 
 Cette version est volontairement stricte par rapport a la consigne:
-- aucun fichier utilitaire non demande (pas de Makefile, pas de README de projet)
+- les fichiers de code restent stricts par rapport a la consigne
 - les exercices "Write a function" contiennent uniquement la fonction (pas de main de demo)
 - la fiche de revision est conservee pour l oral
+
+Note:
+- Makefile et README ont ete remis ensuite sur demande pour faciliter l usage et la presentation
+- cela ne change pas la logique ni la conformite des exercices C
 
 ## 2. Pourquoi on a fait ces exercices
 
