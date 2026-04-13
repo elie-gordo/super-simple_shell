@@ -55,5 +55,5 @@ make clean
 ## Revision
 
 La fiche complete pour preparer la man review est ici:
-- GUIDE_MAN_REVIEW.md
-- EXPLICATION_CODE_PAS_A_PAS.md
+- FICHE_ManReview.md
+- CODE_explications.md
